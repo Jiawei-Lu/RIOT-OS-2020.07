@@ -121,6 +121,14 @@
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/isrpipe.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/tsrb.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/vfs.h \
+ /usr/lib/gcc/arm-none-eabi/10.3.1/include/stdatomic.h \
+ /usr/include/newlib/sys/stat.h /usr/include/newlib/time.h \
+ /usr/include/newlib/machine/time.h /usr/include/newlib/sys/timespec.h \
+ /usr/include/newlib/sys/_timespec.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/sys/posix/include/sys/statvfs.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/kernel_types.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/clist.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/debug.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/thread.h
 /home/jl1n119/PCCOPY/PCRIOT21062022/examples/test/bin/samr21-xpro/riotbuild/riotbuild.h:
@@ -254,5 +262,15 @@
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/isrpipe.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/tsrb.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/vfs.h:
+/usr/lib/gcc/arm-none-eabi/10.3.1/include/stdatomic.h:
+/usr/include/newlib/sys/stat.h:
+/usr/include/newlib/time.h:
+/usr/include/newlib/machine/time.h:
+/usr/include/newlib/sys/timespec.h:
+/usr/include/newlib/sys/_timespec.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/sys/posix/include/sys/statvfs.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/core/include/kernel_types.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/core/include/clist.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/debug.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/thread.h:

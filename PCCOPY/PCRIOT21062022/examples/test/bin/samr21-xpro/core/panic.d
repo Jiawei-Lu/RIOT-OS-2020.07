@@ -111,7 +111,8 @@
  /home/jl1n119/PCCOPY/PCRIOT21062022/cpu/sam0_common/include/cpu_conf.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/cpu/sam0_common/include/timer_config.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/pm_layered.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/log.h
+ /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/log.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/ps.h
 /home/jl1n119/PCCOPY/PCRIOT21062022/examples/test/bin/samr21-xpro/riotbuild/riotbuild.h:
 /usr/include/newlib/string.h:
 /usr/include/newlib/_ansi.h:
@@ -233,3 +234,4 @@
 /home/jl1n119/PCCOPY/PCRIOT21062022/cpu/sam0_common/include/timer_config.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/pm_layered.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/log.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/ps.h:

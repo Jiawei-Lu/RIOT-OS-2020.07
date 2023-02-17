@@ -108,10 +108,7 @@
  /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/i2c.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/boards/samr21-xpro/include/periph_conf.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/spi.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/gpio.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/rtc.h \
- /usr/include/newlib/time.h /usr/include/newlib/machine/time.h \
- /usr/include/newlib/sys/timespec.h /usr/include/newlib/sys/_timespec.h
+ /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/gpio.h
 /home/jl1n119/PCCOPY/PCRIOT21062022/examples/test/bin/samr21-xpro/riotbuild/riotbuild.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/cpu/samd21/include/periph_cpu.h:
 /usr/lib/gcc/arm-none-eabi/10.3.1/include-fixed/limits.h:
@@ -230,8 +227,3 @@
 /home/jl1n119/PCCOPY/PCRIOT21062022/boards/samr21-xpro/include/periph_conf.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/spi.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/gpio.h:
-/home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/periph/rtc.h:
-/usr/include/newlib/time.h:
-/usr/include/newlib/machine/time.h:
-/usr/include/newlib/sys/timespec.h:
-/usr/include/newlib/sys/_timespec.h:

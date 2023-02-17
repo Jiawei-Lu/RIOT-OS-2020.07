@@ -150,10 +150,10 @@
  /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/saul.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/phydat.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/saul/periph.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fs/fatfs.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/fatfs/ff.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/fatfs/integer.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/fatfs/ffconf.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fs/littlefs_fs.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/littlefs/lfs.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/mtd.h \
+ /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fs/constfs.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/sdcard_spi/include/sdcard_spi_internal.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fmt.h \
@@ -161,7 +161,6 @@
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/xtimer.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/timex.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/msg.h \
- /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/rmutex.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h \
  /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/xtimer/tick_conversion.h \
@@ -335,10 +334,10 @@
 /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/saul.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/phydat.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/saul/periph.h:
-/home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fs/fatfs.h:
-/home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/fatfs/ff.h:
-/home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/fatfs/integer.h:
-/home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/fatfs/ffconf.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fs/littlefs_fs.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/build/pkg/littlefs/lfs.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/drivers/include/mtd.h:
+/home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fs/constfs.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/drivers/sdcard_spi/include/sdcard_spi_internal.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/fmt.h:
@@ -347,7 +346,6 @@
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/xtimer.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/timex.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/msg.h:
-/home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/rmutex.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/core/include/mutex.h:
 /home/jl1n119/PCCOPY/PCRIOT21062022/sys/include/xtimer/tick_conversion.h:

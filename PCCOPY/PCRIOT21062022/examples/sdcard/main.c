@@ -27,6 +27,16 @@
 #include <string.h>
 #include <stdio.h>
 
+
+#include "periph/gpio.h"
+
+#include "xtimer.h"
+#include "at30tse75x.h"
+#include "sdcard_spi.h"
+#include "io1_xplained.h"
+#include "io1_xplained_params.h"
+
+
 /* independent of what you specify in a r/w cmd this is the maximum number of blocks read at once.
    If you call read with a bigger blockcount the read is performed in chunks*/
 #define MAX_BLOCKS_IN_BUFFER 4
@@ -34,12 +44,18 @@
 #define FIRST_PRINTABLE_ASCII_CHAR 0x20
 #define ASCII_UNPRINTABLE_REPLACEMENT "."
 
+extern io1_xplained_t dev;
 /* this is provided by the sdcard_spi driver
  * see drivers/sdcard_spi/sdcard_spi.c */
-extern sdcard_spi_t sdcard_spi_devs[ARRAY_SIZE(sdcard_spi_params)];
-sdcard_spi_t *card = &sdcard_spi_devs[0];
-
+extern dev.sdcard[ARRAY_SIZE(sdcard_spi_params)];
+sdcard_spi_t *dev.sdcard = &sdcard_spi_devs[0];
+// card = dev->sdcard;
 uint8_t buffer[SD_HC_BLOCK_SIZE * MAX_BLOCKS_IN_BUFFER];
+
+
+#define DELAY_1S   (1U) /* 1 seconds delay between each test */
+
+
 
 static int _init(int argc, char **argv)
 {
@@ -48,7 +64,7 @@ static int _init(int argc, char **argv)
 
     printf("Initializing SD-card at SPI_%i...", sdcard_spi_params[0].spi_dev);
 
-    if (sdcard_spi_init(card, &sdcard_spi_params[0]) != 0) {
+    if (sdcard_spi_init(&dev.sdcard , &sdcard_spi_params[0]) != 0) {
         puts("[FAILED]");
         #if ENABLE_DEBUG != 1
         puts("enable debugging in sdcard_spi.c for further information!");
@@ -65,14 +81,14 @@ static int _cid(int argc, char **argv)
     (void)argv;
 
     puts("----------------------------------------");
-    printf("MID: %d\n", card->cid.MID);
-    printf("OID: %c%c\n", card->cid.OID[0], card->cid.OID[1]);
-    printf("PNM: %c%c%c%c%c\n", card->cid.PNM[0], card->cid.PNM[1], card->cid.PNM[2],
-                                card->cid.PNM[3], card->cid.PNM[4]);
+    printf("MID: %d\n", dev.sdcard.cid.MID);
+    printf("OID: %c%c\n", dev.sdcard ->cid.OID[0], dev.sdcard ->cid.OID[1]);
+    printf("PNM: %c%c%c%c%c\n", dev.sdcard ->cid.PNM[0], dev.sdcard ->cid.PNM[1], dev.sdcard ->cid.PNM[2],
+                                card->cid.PNM[3], dev.sdcard ->cid.PNM[4]);
     printf("PRV: %u\n", card->cid.PRV);
-    printf("PSN: %" PRIu32 "\n", card->cid.PSN);
-    printf("MDT: %u\n", card->cid.MDT);
-    printf("CRC: %u\n", card->cid.CID_CRC);
+    printf("PSN: %" PRIu32 "\n", dev.sdcard ->cid.PSN);
+    printf("MDT: %u\n", dev.sdcard ->cid.MDT);
+    printf("CRC: %u\n", dev.sdcard ->cid.CID_CRC);
     puts("----------------------------------------");
     return 0;
 }
@@ -82,64 +98,64 @@ static int _csd(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    if (card->csd_structure == SD_CSD_V1) {
+    if (dev.sdcard ->csd_structure == SD_CSD_V1) {
         puts("CSD V1\n----------------------------------------");
-        printf("CSD_STRUCTURE: 0x%0lx\n", (unsigned long)card->csd.v1.CSD_STRUCTURE);
-        printf("TAAC: 0x%0lx\n", (unsigned long)card->csd.v1.TAAC);
-        printf("NSAC: 0x%0lx\n", (unsigned long)card->csd.v1.NSAC);
-        printf("TRAN_SPEED: 0x%0lx\n", (unsigned long)card->csd.v1.TRAN_SPEED);
-        printf("CCC: 0x%0lx\n", (unsigned long)card->csd.v1.CCC);
-        printf("READ_BL_LEN: 0x%0lx\n", (unsigned long)card->csd.v1.READ_BL_LEN);
-        printf("READ_BL_PARTIAL: 0x%0lx\n", (unsigned long)card->csd.v1.READ_BL_PARTIAL);
-        printf("WRITE_BLK_MISALIGN: 0x%0lx\n", (unsigned long)card->csd.v1.WRITE_BLK_MISALIGN);
-        printf("READ_BLK_MISALIGN: 0x%0lx\n", (unsigned long)card->csd.v1.READ_BLK_MISALIGN);
-        printf("DSR_IMP: 0x%0lx\n", (unsigned long)card->csd.v1.DSR_IMP);
-        printf("C_SIZE: 0x%0lx\n", (unsigned long)card->csd.v1.C_SIZE);
-        printf("VDD_R_CURR_MIN: 0x%0lx\n", (unsigned long)card->csd.v1.VDD_R_CURR_MIN);
-        printf("VDD_R_CURR_MAX: 0x%0lx\n", (unsigned long)card->csd.v1.VDD_R_CURR_MAX);
-        printf("VDD_W_CURR_MIN: 0x%0lx\n", (unsigned long)card->csd.v1.VDD_W_CURR_MIN);
-        printf("VDD_W_CURR_MAX: 0x%0lx\n", (unsigned long)card->csd.v1.VDD_W_CURR_MAX);
-        printf("C_SIZE_MULT: 0x%0lx\n", (unsigned long)card->csd.v1.C_SIZE_MULT);
-        printf("ERASE_BLK_EN: 0x%0lx\n", (unsigned long)card->csd.v1.ERASE_BLK_EN);
-        printf("SECTOR_SIZE: 0x%0lx\n", (unsigned long)card->csd.v1.SECTOR_SIZE);
-        printf("WP_GRP_SIZE: 0x%0lx\n", (unsigned long)card->csd.v1.WP_GRP_SIZE);
-        printf("WP_GRP_ENABLE: 0x%0lx\n", (unsigned long)card->csd.v1.WP_GRP_ENABLE);
-        printf("R2W_FACTOR: 0x%0lx\n", (unsigned long)card->csd.v1.R2W_FACTOR);
-        printf("WRITE_BL_LEN: 0x%0lx\n", (unsigned long)card->csd.v1.WRITE_BL_LEN);
-        printf("WRITE_BL_PARTIAL: 0x%0lx\n", (unsigned long)card->csd.v1.WRITE_BL_PARTIAL);
-        printf("FILE_FORMAT_GRP: 0x%0lx\n", (unsigned long)card->csd.v1.FILE_FORMAT_GRP);
-        printf("COPY: 0x%0lx\n", (unsigned long)card->csd.v1.COPY);
-        printf("PERM_WRITE_PROTECT: 0x%0lx\n", (unsigned long)card->csd.v1.PERM_WRITE_PROTECT);
-        printf("TMP_WRITE_PROTECT: 0x%0lx\n", (unsigned long)card->csd.v1.TMP_WRITE_PROTECT);
-        printf("FILE_FORMAT: 0x%0lx\n", (unsigned long)card->csd.v1.FILE_FORMAT);
-        printf("CRC: 0x%0lx\n", (unsigned long)card->csd.v1.CSD_CRC);
+        printf("CSD_STRUCTURE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.CSD_STRUCTURE);
+        printf("TAAC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.TAAC);
+        printf("NSAC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.NSAC);
+        printf("TRAN_SPEED: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.TRAN_SPEED);
+        printf("CCC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.CCC);
+        printf("READ_BL_LEN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.READ_BL_LEN);
+        printf("READ_BL_PARTIAL: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.READ_BL_PARTIAL);
+        printf("WRITE_BLK_MISALIGN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.WRITE_BLK_MISALIGN);
+        printf("READ_BLK_MISALIGN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.READ_BLK_MISALIGN);
+        printf("DSR_IMP: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.DSR_IMP);
+        printf("C_SIZE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.C_SIZE);
+        printf("VDD_R_CURR_MIN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.VDD_R_CURR_MIN);
+        printf("VDD_R_CURR_MAX: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.VDD_R_CURR_MAX);
+        printf("VDD_W_CURR_MIN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.VDD_W_CURR_MIN);
+        printf("VDD_W_CURR_MAX: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.VDD_W_CURR_MAX);
+        printf("C_SIZE_MULT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.C_SIZE_MULT);
+        printf("ERASE_BLK_EN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.ERASE_BLK_EN);
+        printf("SECTOR_SIZE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.SECTOR_SIZE);
+        printf("WP_GRP_SIZE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.WP_GRP_SIZE);
+        printf("WP_GRP_ENABLE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.WP_GRP_ENABLE);
+        printf("R2W_FACTOR: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.R2W_FACTOR);
+        printf("WRITE_BL_LEN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.WRITE_BL_LEN);
+        printf("WRITE_BL_PARTIAL: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.WRITE_BL_PARTIAL);
+        printf("FILE_FORMAT_GRP: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.FILE_FORMAT_GRP);
+        printf("COPY: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.COPY);
+        printf("PERM_WRITE_PROTECT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.PERM_WRITE_PROTECT);
+        printf("TMP_WRITE_PROTECT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.TMP_WRITE_PROTECT);
+        printf("FILE_FORMAT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.FILE_FORMAT);
+        printf("CRC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v1.CSD_CRC);
     }
-    else if (card->csd_structure == SD_CSD_V2) {
+    else if (dev.sdcard ->csd_structure == SD_CSD_V2) {
         puts("CSD V2:\n----------------------------------------");
-        printf("CSD_STRUCTURE: 0x%0lx\n", (unsigned long)card->csd.v2.CSD_STRUCTURE);
-        printf("TAAC: 0x%0lx\n", (unsigned long)card->csd.v2.TAAC);
-        printf("NSAC: 0x%0lx\n", (unsigned long)card->csd.v2.NSAC);
-        printf("TRAN_SPEED: 0x%0lx\n", (unsigned long)card->csd.v2.TRAN_SPEED);
-        printf("CCC: 0x%0lx\n", (unsigned long)card->csd.v2.CCC);
-        printf("READ_BL_LEN: 0x%0lx\n", (unsigned long)card->csd.v2.READ_BL_LEN);
-        printf("READ_BL_PARTIAL: 0x%0lx\n", (unsigned long)card->csd.v2.READ_BL_PARTIAL);
-        printf("WRITE_BLK_MISALIGN: 0x%0lx\n", (unsigned long)card->csd.v2.WRITE_BLK_MISALIGN);
-        printf("READ_BLK_MISALIGN: 0x%0lx\n", (unsigned long)card->csd.v2.READ_BLK_MISALIGN);
-        printf("DSR_IMP: 0x%0lx\n", (unsigned long)card->csd.v2.DSR_IMP);
-        printf("C_SIZE: 0x%0lx\n", (unsigned long)card->csd.v2.C_SIZE);
-        printf("ERASE_BLK_EN: 0x%0lx\n", (unsigned long)card->csd.v2.ERASE_BLK_EN);
-        printf("SECTOR_SIZE: 0x%0lx\n", (unsigned long)card->csd.v2.SECTOR_SIZE);
-        printf("WP_GRP_SIZE: 0x%0lx\n", (unsigned long)card->csd.v2.WP_GRP_SIZE);
-        printf("WP_GRP_ENABLE: 0x%0lx\n", (unsigned long)card->csd.v2.WP_GRP_ENABLE);
-        printf("R2W_FACTOR: 0x%0lx\n", (unsigned long)card->csd.v2.R2W_FACTOR);
-        printf("WRITE_BL_LEN: 0x%0lx\n", (unsigned long)card->csd.v2.WRITE_BL_LEN);
-        printf("WRITE_BL_PARTIAL: 0x%0lx\n", (unsigned long)card->csd.v2.WRITE_BL_PARTIAL);
-        printf("FILE_FORMAT_GRP: 0x%0lx\n", (unsigned long)card->csd.v2.FILE_FORMAT_GRP);
-        printf("COPY: 0x%0lx\n", (unsigned long)card->csd.v2.COPY);
-        printf("PERM_WRITE_PROTECT: 0x%0lx\n", (unsigned long)card->csd.v2.PERM_WRITE_PROTECT);
-        printf("TMP_WRITE_PROTECT: 0x%0lx\n", (unsigned long)card->csd.v2.TMP_WRITE_PROTECT);
-        printf("FILE_FORMAT: 0x%0lx\n", (unsigned long)card->csd.v2.FILE_FORMAT);
-        printf("CRC: 0x%0lx\n", (unsigned long)card->csd.v2.CSD_CRC);
+        printf("CSD_STRUCTURE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.CSD_STRUCTURE);
+        printf("TAAC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.TAAC);
+        printf("NSAC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.NSAC);
+        printf("TRAN_SPEED: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.TRAN_SPEED);
+        printf("CCC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.CCC);
+        printf("READ_BL_LEN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.READ_BL_LEN);
+        printf("READ_BL_PARTIAL: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.READ_BL_PARTIAL);
+        printf("WRITE_BLK_MISALIGN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.WRITE_BLK_MISALIGN);
+        printf("READ_BLK_MISALIGN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.READ_BLK_MISALIGN);
+        printf("DSR_IMP: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.DSR_IMP);
+        printf("C_SIZE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.C_SIZE);
+        printf("ERASE_BLK_EN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.ERASE_BLK_EN);
+        printf("SECTOR_SIZE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.SECTOR_SIZE);
+        printf("WP_GRP_SIZE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.WP_GRP_SIZE);
+        printf("WP_GRP_ENABLE: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.WP_GRP_ENABLE);
+        printf("R2W_FACTOR: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.R2W_FACTOR);
+        printf("WRITE_BL_LEN: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.WRITE_BL_LEN);
+        printf("WRITE_BL_PARTIAL: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.WRITE_BL_PARTIAL);
+        printf("FILE_FORMAT_GRP: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.FILE_FORMAT_GRP);
+        printf("COPY: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.COPY);
+        printf("PERM_WRITE_PROTECT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.PERM_WRITE_PROTECT);
+        printf("TMP_WRITE_PROTECT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.TMP_WRITE_PROTECT);
+        printf("FILE_FORMAT: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.FILE_FORMAT);
+        printf("CRC: 0x%0lx\n", (unsigned long)dev.sdcard ->csd.v2.CSD_CRC);
     }
     puts("----------------------------------------");
     return 0;
@@ -152,7 +168,7 @@ static int _sds(int argc, char **argv)
 
     sd_status_t sds;
 
-    if (sdcard_spi_read_sds(card, &sds) == SD_RW_OK) {
+    if (sdcard_spi_read_sds(dev.sdcard , &sds) == SD_RW_OK) {
         puts("SD status:\n----------------------------------------");
         printf("SIZE_OF_PROTECTED_AREA: 0x%0lx\n", (unsigned long)sds.SIZE_OF_PROTECTED_AREA);
         printf("SUS_ADDR: 0x%0lx\n", (unsigned long)sds.SUS_ADDR);
@@ -180,7 +196,7 @@ static int _size(int argc, char **argv)
     (void)argc;
     (void)argv;
 
-    uint64_t bytes = sdcard_spi_get_capacity(card);
+    uint64_t bytes = sdcard_spi_get_capacity(dev.sdcard );
 
     uint32_t gib_int = bytes / (SDCARD_SPI_IEC_KIBI * SDCARD_SPI_IEC_KIBI * SDCARD_SPI_IEC_KIBI);
     uint32_t gib_frac = ( (((bytes/(SDCARD_SPI_IEC_KIBI * SDCARD_SPI_IEC_KIBI))
@@ -223,7 +239,7 @@ static int _read(int argc, char **argv)
             chunk_blocks = MAX_BLOCKS_IN_BUFFER;
         }
         sd_rw_response_t state;
-        int chunks_read = sdcard_spi_read_blocks(card, blockaddr + total_read, buffer,
+        int chunks_read = sddev.sdcard _spi_read_blocks(dev.sdcard , blockaddr + total_read, buffer,
                                                  SD_HC_BLOCK_SIZE, chunk_blocks, &state);
 
         if (state != SD_RW_OK) {
@@ -304,7 +320,7 @@ static int _write(int argc, char **argv)
     }
 
     sd_rw_response_t state;
-    int chunks_written = sdcard_spi_write_blocks(card, bladdr, write_buffer, SD_HC_BLOCK_SIZE, 1, &state);
+    int chunks_written = sdcard_spi_write_blocks(dev.sdcard , bladdr, write_buffer, SD_HC_BLOCK_SIZE, 1, &state);
 
     if (state != SD_RW_OK) {
         printf("write error %d (wrote %d/%d blocks)\n", state, chunks_written, 1);
@@ -330,7 +346,7 @@ static int _copy(int argc, char **argv)
     dst_block = atoi(argv[2]);
 
     sd_rw_response_t rd_state;
-    sdcard_spi_read_blocks(card, src_block, tmp_copy, SD_HC_BLOCK_SIZE, 1, &rd_state);
+    sdcard_spi_read_blocks(dev.sdcard , src_block, tmp_copy, SD_HC_BLOCK_SIZE, 1, &rd_state);
 
     if (rd_state != SD_RW_OK) {
         printf("read error %d (block %d)\n", rd_state, src_block);
@@ -338,7 +354,7 @@ static int _copy(int argc, char **argv)
     }
 
     sd_rw_response_t wr_state;
-    sdcard_spi_write_blocks(card, dst_block, tmp_copy, SD_HC_BLOCK_SIZE, 1, &wr_state);
+    sdcard_spi_write_blocks(dev.sdcard , dst_block, tmp_copy, SD_HC_BLOCK_SIZE, 1, &wr_state);
 
     if (wr_state != SD_RW_OK) {
         printf("write error %d (block %d)\n", wr_state, dst_block);
@@ -355,7 +371,7 @@ static int _sector_count(int argc, char **argv)
     (void)argv;
 
     printf("available sectors on card: %" PRIu32 "\n",
-           sdcard_spi_get_sector_count(card));
+           sdcard_spi_get_sector_count(dev.sdcard ));
     return 0;
 }
 
@@ -374,15 +390,77 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+
+static void _sd_card_cid(void)
+{
+    puts("SD Card CID info:");
+    printf("MID: %d\n", dev.sdcard.cid.MID);
+    printf("OID: %c%c\n", dev.sdcard.cid.OID[0], dev.sdcard.cid.OID[1]);
+    printf("PNM: %c%c%c%c%c\n",
+           dev.sdcard.cid.PNM[0], dev.sdcard.cid.PNM[1], dev.sdcard.cid.PNM[2],
+           dev.sdcard.cid.PNM[3], dev.sdcard.cid.PNM[4]);
+    printf("PRV: %u\n", dev.sdcard.cid.PRV);
+    printf("PSN: %" PRIu32 "\n", dev.sdcard.cid.PSN);
+    printf("MDT: %u\n", dev.sdcard.cid.MDT);
+    printf("CRC: %u\n", dev.sdcard.cid.CID_CRC);
+    puts("+----------------------------------------+\n");
+}
+
 int main(void)
 {
     puts("SD-card spi driver test application");
 
-    card->init_done = false;
+    dev.sdcard ->init_done = false;
 
     puts("insert SD-card and use 'init' command to set card to spi mode");
     puts("WARNING: using 'write' or 'copy' commands WILL overwrite data on your sd-card and");
     puts("almost for sure corrupt existing filesystems, partitions and contained data!");
+
+    float temperature;
+
+if (io1_xplained_init(&dev, &io1_xplained_params[0]) != IO1_XPLAINED_OK) {
+        puts("[Error] Cannot initialize the IO1 Xplained extension\n");
+        return 1;
+    }
+puts("Initialization successful");
+    puts("\n+--------Starting tests --------+");
+    
+        /* Get temperature in degrees celsius */
+        at30tse75x_get_temperature(&dev.temp, &temperature);
+        printf("Temperature [°C]: %i.%03u\n"
+               "+-------------------------------------+\n",
+               (int)temperature,
+               (unsigned)((temperature - (int)temperature) * 1000));
+        xtimer_sleep(DELAY_1S);
+
+        /* Card detect pin is inverted */
+        if (!gpio_read(IO1_SDCARD_SPI_PARAM_DETECT)) {
+            _sd_card_cid();
+            xtimer_sleep(DELAY_1S);
+        }
+
+        uint16_t light;
+        io1_xplained_read_light_level(&light);
+        printf("Light level: %i\n"
+               "+-------------------------------------+\n",
+               light);
+        xtimer_sleep(DELAY_1S);
+
+        /* set led */
+        gpio_set(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
+
+        /* clear led */
+        gpio_clear(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
+
+        /* toggle led */
+        gpio_toggle(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
+
+        /* toggle led again */
+        gpio_toggle(IO1_LED_PIN);
+        xtimer_sleep(DELAY_1S);
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;

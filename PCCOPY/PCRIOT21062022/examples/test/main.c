@@ -28,7 +28,7 @@
 #include "shell.h"
 #include "board.h" /* MTD_0 is defined in board.h */
 /* Configure MTD device for SD card if none is provided */
-#if !defined(MTD_0) || MODULE_MTD_SDCARD
+#if !defined(MTD_0) && MODULE_MTD_SDCARD
 #include "mtd_sdcard.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_params.h"

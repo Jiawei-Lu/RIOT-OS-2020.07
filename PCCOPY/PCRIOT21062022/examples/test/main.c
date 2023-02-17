@@ -53,7 +53,7 @@ static mtd_dev_t *mtd0 = (mtd_dev_t*)&mtd_sdcard_dev;
 #endif
 
 /* Flash mount point */
-#define FLASH_MOUNT_POINT   "/sda"
+#define FLASH_MOUNT_POINT   "/nvm0"
 
 /* In this example, MTD_0 is used as mtd interface for littlefs or spiffs */
 /* littlefs and spiffs basic usage are shown */
@@ -203,7 +203,7 @@ static vfs_mount_t const_mount = {
 #include "sdcard_spi.h"
 #include "io1_xplained.h"
 #include "io1_xplained_params.h"
-
+#include "vfs_default.h"
 
 /* independent of what you specify in a r/w cmd this is the maximum number of blocks read at once.
    If you call read with a bigger blockcount the read is performed in chunks*/
@@ -769,7 +769,16 @@ puts("Initialization successful");
         /* toggle led again */
         gpio_toggle(IO1_LED_PIN);
         xtimer_sleep(DELAY_1S);
-    
+
+    vfs_DIR mount = {0};
+
+    /* list mounted file systems */
+    puts("mount points:");
+    while (vfs_iterate_mount_dirs(&mount)) {
+        printf("\t%s\n", mount.mp->mount_point);
+    }
+    printf("\ndata dir: %s\n", VFS_DEFAULT_DATA);
+
 char line_buf[SHELL_DEFAULT_BUFSIZE];
 shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
